@@ -1,0 +1,83 @@
+Memo exported from J-Pilot 1.8.2 on 07/24/15 15:21
+
+Memo: 15
+Category: LispMe
+Private: Нет
+----- Start of Memo -----
+;g-o-l
+
+(define field #(
+           #(0 0 1 1 1 0 0 0 0 0)
+           #(0 0 0 1 0 0 0 0 0 0)
+	 #(0 0 0 0 0 1 1 0 1 1)
+	 #(0 0 1 1 1 1 1 1 1 1)
+	 #(0 0 0 1 1 1 1 0 1 0)
+	 #(0 0 0 0 0 1 0 1 0 0)
+	 #(0 0 0 0 1 1 1 0 1 0)
+	 #(0 0 1 1 1 1 1 1 0 0)
+           #(0 0 0 0 0 1 1 1 1 0)
+           #(0 0 0 0 0 0 1 1 0 0)
+	  ))
+
+; 2 dimensional vector mutator
+(define (vec2-set! v i j to)
+  (vector-set! (vector-ref v i) j to))
+
+; 2 dimensional vector accessor
+(define (vec2-ref v i j)
+  (vector-ref (vector-ref v i) j))
+
+; spider-webs
+(define spider-webs
+	    #((1. 0)
+	 	(-1. 0)
+		(-1. -1)
+		(-1. 1)
+		(1. 1)
+		(1. -1)
+		(0. -1)
+		(0. 1)))
+
+(define (kmx x)
+	(car(vector-ref spider-webs x)))
+
+(define (kmy y)
+	(cdr (vector-ref spider-webs y)))
+
+(define (sum-on-sw b cpx cpy)
+	(do ((i 0 (+ i 1)) (sum 0))
+	((= i 8) sum)
+  	(set! sum (+ sum (vec2-ref b (integer (+ cpx (kmx i))) (integer (+ cpy (car(kmy i)))))))))
+
+;render board
+(define (rend-field) (do ((i 0 (+ i 1)))
+	((= i 10))
+  (display (do ((j 0 (+ j 1)))
+	((= j 10))
+  (display (vec2-ref field i j))))(newline)))
+
+(define (field-alive? x y)
+	(= (vec2-ref field x y) 1))
+
+;live-and-let-die!
+(define (lnld x y)
+	(cond ((< (sum-on-sw field x y)  2) (vec2-set! field x y 0))
+((= (sum-on-sw field x y)  2) (vec2-set! field x y 1))
+	((>= (sum-on-sw field x y) 3) (vec2-set! field x y 0))))
+
+(define (gol c) 
+	(do ((k 1 (+ k 1)))
+	    ((= k c ) k) 
+	(;tut vse fnii 
+	    (do ((j 1 (+ j 1)))
+	     ((= j 8))
+  	         (do ((i 1 (+ i 1)))
+	            ((= i 8))
+		  (lnld j i)))
+	(rend-field))))
+
+;		
+;		(wait 3000)
+;		(clear-output-field)
+----- End of Memo -----
+
